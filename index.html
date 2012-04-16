@@ -1,0 +1,96 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>QUT Library</title> 
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0"> 
+
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
+	<link rel="stylesheet" href="jquery.mobile-1.0.1/jquery.mobile-1.0.1.min.css" />
+
+	<link rel="stylesheet" href="style.css" />
+	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function(){
+		  $("#locate").click(function() {
+		    navigator.geolocation.getCurrentPosition(foundLocation, noLocation);
+		  });
+
+		  navigator.geolocation.getCurrentPosition(foundLocation, noLocation);
+
+		  function foundLocation(position) {
+		    var lat = position.coords.latitude;
+		    var lon = position.coords.longitude;
+		    var userLocation = lat + ',' + lon;
+		  }
+		  function noLocation() {
+		    $("#error").watermark("Could not find location");
+			document.getElementById("error").innerHtml = "Could not find location";
+		  }
+		})//end DocReady
+	
+	</script>
+	<link rel="apple-touch-icon" href="icon/favicon.png" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />  
+</head> 
+
+<body> 
+
+	<div data-role="page" data-theme="c">
+
+		<div data-role="header" data-theme="b">
+			<h1>QUT Library</h1>
+		</div><!-- /header -->
+
+		<div data-role="content">	
+			<div class="iconBox">
+				<a href="loaned.html">
+					<img id="loaned" class="icon" src="icon/loaned.png">
+					<p class="iconTitle">Loaned</p>
+				</a>
+			</div>
+			
+			<div data-role="" class="iconBox">
+				<a href="requests.html">
+					<img id="request" class="icon" src="icon/request.png">
+					<p class="iconTitle">Requested</p>
+				</a>
+			</div>
+
+			<div data-role="" class="iconBox">
+				<a href="search.html">
+					<img id="search" class="icon" src="icon/search.png">
+					<p class="iconTitle">Search</p>
+				</a>
+			</div>			
+
+			<div class="iconBox">
+				<a href="favourites.html">
+					<img id="favourites" class="icon" src="icon/fav.png">
+					<p class="iconTitle">Favourites</p>
+				</a>
+			</div>
+			
+			<div class="iconBox">
+				<a href="scan.html">
+					<img id="scan" class="icon" src="icon/scan.png">
+					<p class="iconTitle">Scan</p>
+				</a>
+			</div>
+			
+			<div class="iconBox">
+				<a href="location.html">
+					<img id="location" class="icon" src="icon/map.png">
+					<p class="iconTitle">Location</p>
+				</a>
+			</div>
+
+		</div><!-- /content -->
+
+	</div><!-- /page -->
+	
+</body>
+</html>

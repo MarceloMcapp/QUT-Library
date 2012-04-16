@@ -1,0 +1,50 @@
+@charset "utf-8";
+
+/* index.html */
+
+img a {
+	border: none;
+}
+
+.iconBox {
+	float: left;
+	width: 80px;
+	text-align: center;
+	margin-left: 12px;
+	margin-bottom: 25px;
+	margin-top: 20px;
+}
+
+.icon {
+	padding: 0px;
+	margin: 0px;
+}
+
+img.icon {
+	max-width: 65px;
+	margin: 0px;
+	padding: 0px;
+}
+
+p.iconTitle {
+	padding: 0px;
+	margin: 0px;
+	font-size: 14px;
+	text-decoration: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+/* Favourites */
+
+.availability {
+	float: right;
+}
+
+/* Loaned */
+
+.dueDate {
+	float: right;
+}
