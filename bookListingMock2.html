@@ -13,11 +13,12 @@
 	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
 	<script src="jquery.mobile-1.0.1/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
 	<script src="script.js"></script>
-	
+
 	<link rel="apple-touch-icon" href="icon/favicon.png" />
     <link rel="apple-touch-startup-image" href="img/splash.png" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
 
 </head> 
 
@@ -26,14 +27,30 @@
 	<div data-role="page" data-theme="c">
 
 		<div data-role="header" data-theme="b">
-			<a href="index.html" data-transition="reverse slide" data-icon="home">Home</a>
+			<a href="searchMock.html" data-transition="reverse slide" data-icon="back">Back</a>
 			<h1>Search</h1>
+			<a href="" data-theme="b" data-inline="true" data-mini="true" data-iconpos="notext" data-icon="star" title="Favourite"></a>
 		</div><!-- /header -->
 
-		<div data-role="content">
-			<form action="searchMock.html"  data-transition="none">
-				<input type="search" />
-			</form>
+		<div data-role="content">	
+			<div>
+				<div class="availability" id="notAvailable">
+					Unavailable to 25/05/12
+				</div>
+				<div class="bookCover">
+					<img src="img/ios5.jpg" />
+				</div>
+				<div class="bookDetails">
+					<span class="bookTitle">iOS 4 Programming Cookbook</span>
+					<span class="bookEdition">1st edition</span>
+					<span class="bookAuthor">Nahavandipoor, Vandad</span>
+					<span class="bookLocation">Location: Kelvin Grove 005.26 84  </span>
+					<br />
+				</div>
+			</div>
+			<div style="clear:both"></div>
+			<a href="reserve.html" id="loanButton" class="button" data-role="button">Reserve</a>
+
 		</div><!-- /content -->
 
 	</div><!-- /page -->

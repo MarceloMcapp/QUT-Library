@@ -13,29 +13,28 @@
 	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
 	<script src="jquery.mobile-1.0.1/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
 	<script src="script.js"></script>
-	
+		
 	<link rel="apple-touch-icon" href="icon/favicon.png" />
     <link rel="apple-touch-startup-image" href="img/splash.png" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-
+	
 </head> 
 
 <body> 
 
-	<div data-role="page" data-theme="c">
+	<div id="scanPage" data-role="page" data-theme="c">
 
 		<div data-role="header" data-theme="b">
-			<a href="index.html" data-transition="reverse slide" data-icon="home">Home</a>
-			<h1>Search</h1>
+			<a href="bookListingMock.html" data-transition="reverse slide" data-icon="back">Back</a>
+			<h1>Scan book</h1>
 		</div><!-- /header -->
-
-		<div data-role="content">
-			<form action="searchMock.html"  data-transition="none">
-				<input type="search" />
-			</form>
-		</div><!-- /content -->
-
+		
+		<div id="scanImages">
+			<a href="" class="scanImgLink"><img class="scanImg" id="scanImg1" src="img/scan/scan1.png" /></a>
+			<!-- <img class="scanImg" id="scanImg2" src="img/scan/scan2.png" />
+			<img class="scanImg" id="scanImg3" src="img/scan/scan3.png" /> -->
+		</div>
 	</div><!-- /page -->
 	
 </body>
