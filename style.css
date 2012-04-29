@@ -48,3 +48,130 @@ a {
 .dueDate {
 	float: right;
 }
+
+/* Search Listing */
+
+h3.listingBookTitle {
+	margin: 0px;
+	padding: 0px;
+}
+
+.listAvailability {
+	float: right;
+	margin-top: 10px;
+}
+
+.notAvailable {
+	color: #f00;
+}
+
+.available {
+	color: #0c0;
+}
+
+/* Book Details */
+
+.availability {
+	width: 230px;
+	text-align: center;
+	margin: 20px;
+	margin-top: 0px;
+	margin-bottom: 15px;
+	padding: 5px 0;
+	border-radius: 15px;
+	text-shadow: none;
+	box-shadow: #aaa 0px 0px 5px;
+	font-size: 12px;
+}
+
+div#notAvailable {
+	background-color: #f77;
+	border: 1px solid #f99;
+	background: -webkit-gradient(linear, left top, left bottom, from(#faa), to(#f77));
+}
+
+div#loaned {
+	background-color: none;
+	border: none;
+	font-size: 18px;
+	box-shadow: none;
+	color: #0a0;
+	font-weight: bold;
+}
+
+.bookCover, .bookDetails {
+	display: inline;
+	float: left;
+}
+
+.bookCover {
+	padding: 0px;
+	margin: 0px;
+
+}
+.bookCover img{
+	margin: 0px 0px 0px -5px;
+	padding: 0px;
+	width: 70px;
+	border: 1px solid #000;
+}
+
+.bookDetails {
+	width: 200px;
+	margin: 0 0 0 10px;
+	padding: 0px;
+}
+
+.bookDetails span {
+	display: block;
+}
+
+.bookCover {
+	padding: 0px;
+	margin: 0px;
+	display: inline;
+}
+
+span.bookTitle {
+	font-size: 16px;
+}
+
+.bookEdition {
+	font-style: italic;
+	margin: 10px 5px;
+}
+span.bookAuthor {
+/* 	text-indent: -15px;
+	margin-left: 100px;*/
+	margin-bottom: 10px;
+	font-size: 14px;
+	font-weight: normal;
+}
+
+.bookEdition, .bookLocation{
+	font-weight: normal;
+	font-size: 12px;
+}
+
+
+a#loanButton {
+	text-align:center;
+	text-indent: none;
+	font-size:10px;
+}
+
+
+/* scan mock */
+#scanImages {
+	text-align: center;
+	margin: 10px;
+}
+
+#scanImg1, #scanImg2, #scanImg3 {
+	max-width: 300px;
+	margin: auto;
+}
+
+#scanImg2, #scanImg3 {
+	display: none;
+}
