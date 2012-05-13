@@ -1,41 +1,23 @@
 <!DOCTYPE html> 
 <html> 
-	<head> 
+	<head>
 	<title>QUT Library</title> 
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0"> 
 
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
 	<link rel="stylesheet" href="jquery.mobile-1.0.1/jquery.mobile-1.0.1.min.css" />
-
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
 	<link rel="stylesheet" href="style.css" />
-	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
-	<script src="jquery.mobile-1.0.1/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
 	
+	<script src="jquery/jquery-1.6.4.min.js"></script>
+	<script src="jquery.mobile-1.0.1/jquery.mobile-1.0.1.js"></script>
+	<script src="script.js"></script>
+		
 	<link rel="apple-touch-icon" href="icon/favicon.png" />
-    <link rel="apple-touch-startup-image" href="img/splash.png" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-<script type="text/javascript">
-
-	function test() {
-		// Try and get a database object
-		var db;
-
-	    if (window.openDatabase) {
-	        db = openDatabase("Favourites", "1.0", "Favourite QUT Library books", 200000);
-	        if (!db) {
-	            alert("Failed to open the database on disk.This is probably because the version was bad or there is not enough space left in this domain's quota");
-			}
-	    } else {
-	        alert("Couldn't open the database.  Please try with a WebKit nightly with this feature enabled");
-		}
-	}
-</script>
-
-</head> 
+</head>
 
 <body onload="test()"> 
 

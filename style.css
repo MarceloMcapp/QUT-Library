@@ -1,5 +1,16 @@
 @charset "utf-8";
 
+.ui-body-c, .ui-dialog.ui-overlay-c {
+	background-color: #fff;
+
+	background-image: -webkit-gradient(linear,left top,left bottom,from (#FFF),to(#EEE));
+	background-image: -webkit-linear-gradient(#FFF,	#EEE);
+	background-image: -moz-linear-gradient(#FFF, #EEE);
+	background-image: -ms-linear-gradient(#FFF, #EEE);
+	background-image: -o-linear-gradient(#FFF, #EEE);
+	background-image: linear-gradient(#FFF,	#EEE);
+	}
+}
 /* index.html */
 
 img a {
@@ -8,11 +19,40 @@ img a {
 
 .iconBox {
 	float: left;
+	height: auto;
 	width: 80px;
 	text-align: center;
 	margin-left: 12px;
-	margin-bottom: 25px;
-	margin-top: 20px;
+	margin-bottom: 0px;
+	margin-top: 10px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.notSelectable {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.iconBox a{
+	height: auto;
+	display: block;
+	padding: 0px;
+}
+
+.iconBox a:active{
+	box-shadow: 0px 0px 1px #acf, inset 0px 0px 5px #acf;
+	border-radius: 5px 5px;
+/*	background-color: #ffd;*/
+	background-opacity: 0.3;
 }
 
 .icon {
@@ -26,10 +66,12 @@ img.icon {
 	padding: 0px;
 }
 
-p.iconTitle {
+.iconTitle {
 	padding: 0px;
 	margin: 0px;
+	font-weight: normal;
 	font-size: 14px;
+	color: #000;
 	text-decoration: none;
 }
 

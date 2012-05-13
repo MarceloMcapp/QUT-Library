@@ -1,4 +1,153 @@
-$( '#scanPage' ).live( 'pageinit',function(event){
+
+
+
+if (!window.openDatabase) {  
+   	console.log('Databases are not supported in this browser.');
+} else {
+	var db;
+	createDB();
+}
+
+function initDB() {
+	try {
+		db = openDatabase('libdb', '1.0', 'Library Database', 2 * 1024 * 1024);		
+		console.log("Database open.")
+	} catch(e) {
+		if ( e == 2) 
+			console.log("Invalid database version.");
+	}
+}
+function createDB() {
+	try {
+		if (!window.openDatabase) {  
+	    	console.log('Databases are not supported in this browser.');
+		} else {
+			initDB();
+			
+			var output;
+	
+			db.transaction(function (tx) {
+				tx.executeSql('DROP TABLE libbook');
+				console.log("Table libbook dropped.");
+				
+				tx.executeSql('CREATE TABLE IF NOT EXISTS libbook (id, title, edition, author, isbn ,location, availability, coverurl)');
+				console.log("Table libbook created.");
+				
+				tx.executeSql('INSERT INTO libbook VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "img/ios5.jpg")');
+				tx.executeSql('INSERT INTO libbook VALUES (2, "iOS 4 Programming Cookbook", "1st edition", "Nahavandipoor, Vandad", "9377345634634","Kelvin Grove (005.26.84)", "Available", "")');
+				tx.executeSql('INSERT INTO libbook VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "97800321116291","Gardens Point (005.06.32)", "Available", "")');
+				tx.executeSql('INSERT INTO libbook VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "")');
+				console.log("4 items inserted into table libbook");
+				
+				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId, loanDate, endDate)');
+				
+				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId)');
+			
+			}); // DB transaction
+			
+		} // end else
+		
+	} catch(e) {  
+        if (e == 2) {  
+            // Version number mismatch.  
+           	console.log("Invalid database version.");  
+        } else {  
+            console.log("Unknown error "+e+".");  
+        }
+
+       	return;  
+
+	} // catch
+	
+}
+
+// $(document).ready(function() {
+// });
+
+function emptyList(listId) {
+	// Removing all elements in list
+	console.log("Removing all elements in list " + listId);
+	var list = listId + " li";
+
+	$(list).each(
+	  function() {
+	    	var elem = $(this);
+	    	elem.remove();
+	  	}
+	);
+}
+
+// Search page
+$('#searchPage').live( 'pageinit',function(event) {
+ 	$("#search").submit(function() {
+
+		var searchValue = document.getElementById("searchBooksField").value;
+		
+		emptyList("#bookSearchListing");
+
+		db.transaction(function (tx) {
+			tx.executeSql('SELECT * FROM libbook WHERE (title LIKE ?)', ["%"+searchValue+"%"], function (tx, results) {
+				var len = results.rows.length, i;
+		
+			   	// output = "<p>Found rows: " + len + "</p>";
+				// alert(output);
+			   	// document.querySelector('#status').innerHTML +=  output;
+		
+		   		for (i = 0; i < len; i++){
+					$("ul").append("<li><a href='book.html?id=" + results.rows.item(i).id + "'>\n"
+									+ "<h3 class='listingBookTitle'>" + results.rows.item(i).title + "</h3>\n"
+									+ "<div><br/>"
+									+ "<p class='author'>" + results.rows.item(i).author + "</p>"
+									+ "<p class='listAvailability'>" + results.rows.item(i).availability + "</p>"
+									+ "</div>"
+									+ "</a></li>");
+				}
+
+				$("#bookSearchListing").listview("refresh"); // This line now updates the listview
+		 	}, null);
+		}); // transaction
+		return false;
+	}); // submit
+});
+
+
+$('#bookInfoPage').live( 'pageinit',function(event) {
+	
+	var $_GET = {};
+
+	document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
+	    function decode(s) {
+	        return decodeURIComponent(s.split("+").join(" "));
+	    }
+
+	    $_GET[decode(arguments[1])] = decode(arguments[2]);
+	});
+
+	var id= parseInt($_GET["id"]);
+
+	
+	db.transaction(function (tx) {
+		tx.executeSql('SELECT * FROM libbook WHERE id = ?', [id], function (tx, result) {
+			var book = result.rows.item(0);
+			
+
+			document.querySelector('.bookTitle').innerHTML = book.title;
+			document.querySelector('.bookEdition').innerHTML = book.edition;
+			document.querySelector('.bookAuthor').innerHTML = book.author;
+			document.querySelector('.bookLocation').innerHTML = book.location;
+			document.querySelector('.bookISBN').innerHTML = book.isbn;
+			document.querySelector('.bookAvailability').innerHTML = book.availability;
+
+			document.getElementById("bookInfoImage").src = book.coverurl;
+
+		}, null);
+	}); // transaction
+});
+
+
+// Scan animation
+$('#scanPage').live( 'pageinit',function(event){
+	
 	var rotator = document.getElementById("scanImg1"); // change to match image ID
 	var imageDir = 'img/scan/';						   // change to match images folder
 	var delayInSeconds = 5;                            // set number of seconds delay
@@ -25,7 +174,7 @@ $( '#scanPage' ).live( 'pageinit',function(event){
 	setInterval(changeImage, delayInSeconds * 150);
 });
 
-
+/* // Getting current location
 $( '#locationPage' ).live( 'pageinit',function(event){
 	$("#locate").click(function() {
 	  	navigator.geolocation.getCurrentPosition(foundLocation, noLocation);
@@ -43,4 +192,4 @@ $( '#locationPage' ).live( 'pageinit',function(event){
 	  	document.getElementById("error").innerHtml = "Could not find location";
 	}
 })//end DocReady
-
+*/
