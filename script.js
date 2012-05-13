@@ -26,10 +26,10 @@ function createDB() {
 			initDB();
 			
 			db.transaction(function (tx) {
-				// tx.executeSql('DROP TABLE BOOKS');
+				tx.executeSql('DROP TABLE BOOKS');
 				console.log("Table BOOKS dropped.");
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id, title, edition, author, isbn ,location, availability, coverurl)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY, title, edition, author, isbn ,location, availability, coverurl)');
 				console.log("Table BOOKS created.");
 				
 				tx.executeSql('INSERT INTO BOOKS VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "img/ios5.jpg")');
@@ -104,48 +104,67 @@ function emptyList(listId) {
 }
 
 // Search page
-$('#searchPage').live( 'pageinit',function(event) {
- 	$("#search").submit(function() {
+// $('#searchPage').live( 'pageinit',function(event) {
+// 	console.log("Search page init");
+// });
 
-		var searchValue = document.getElementById("searchBooksField").value;
+$("#search").live( 'submit', function() {
+	
+	console.log("Searching ...");
+	var searchValue = document.getElementById("searchBooksField").value;
 
-//		emptyList("#bookSearchListing");
+	emptyList("#bookSearchListing");
 
-		console.log("Fetching all books where title = " + searchValue);
+	console.log("Fetching all books where title = " + searchValue);
 
-		db.transaction(function (tx) {
-			console.log("Executing ...");
-			tx.executeSql('SELECT * FROM BOOKS WHERE (title LIKE ?)', ["%" + searchValue + "%"], function (tx, results) {
-				console.log("Executed!");
-				var len = results.rows.length, i;
+	db.transaction(function (tx) {
+		console.log("Executing ...");
+		tx.executeSql('SELECT * FROM BOOKS WHERE (title LIKE ?)', ["%" + searchValue + "%"], function (tx, results) {
+			console.log("Executed.");
+			
+			
+			var books = results.rows;
+			var book;
+			var len = books.length, i;
 
-				console.log(len + " rows found. Adding to list: ");
+			console.log(len + " rows found. Adding to list: ");
+			
+			
+			for (i = 0; i < len; i++) {
+				book = results.rows.item(i);
+				$("ul").append("<li><a class='bookLink' href='book.html?id=" + book.id + "' name='" + book.id + "'>\n"
+								+ "<h3 class='listingBookTitle'>" + book.title + "</h3>\n"
+								+ "<div><br/>"
+								+ "<p class='author'>" + book.author + "</p>"
+								+ "<p class='listAvailability'>" + book.availability + "</p>"
+								+ "</div>"
+								+ "</a></li>");
+				console.log("Added: " + results.rows.item(i).title);
+			}
 
-				for (i = 0; i < len; i++) {
-					$("ul").append("<li><a href='book.html?id=" + results.rows.item(i).id + "'>\n"
-									+ "<h3 class='listingBookTitle'>" + results.rows.item(i).title + "</h3>\n"
-									+ "<div><br/>"
-									+ "<p class='author'>" + results.rows.item(i).author + "</p>"
-									+ "<p class='listAvailability'>" + results.rows.item(i).availability + "</p>"
-									+ "</div>"
-									+ "</a></li>");
-					console.log("Added: " + results.rows.item(i).title);
-				}
+			console.log("Refreshing list.");
+			
+			$("#bookSearchListing").listview("refresh"); // This line now updates the listview		
+			
+	 	}, null);
+		
+	}); // transaction
 
-				console.log("Refreshing list.");
-				$("#bookSearchListing").listview("refresh"); // This line now updates the listview
-		 	}, null);
-		}); // transaction
 
-		return false;
-	}); // submit
+}); // submit
+	
+	
+
+
+var bookNumber;
+$(".bookLink").live('click', function() {
+	bookNumber = this.name;
 });
 
 // Book information page
-$('#bookInfoPage').live( 'pageinit',function(event) {
-	
+$('#bookInfoPage').live('pageinit' ,function(event) {
+
 	var $_GET = {};
-	
 	document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
 	    function decode(s) {
 	        return decodeURIComponent(s.split("+").join(" "));
@@ -153,11 +172,14 @@ $('#bookInfoPage').live( 'pageinit',function(event) {
 
 	    $_GET[decode(arguments[1])] = decode(arguments[2]);
 	});
-
-
+	
 	var id = parseInt($_GET["id"]);
+	if (isNaN(id)) {
+		id = window.bookNumber;
+	}
 	
 	console.log("Fetching book with id = " + id);
+
 	db.transaction(function (tx) {
 		tx.executeSql('SELECT * FROM BOOKS WHERE id = ?', [id], function (tx, result) {
 
@@ -179,6 +201,8 @@ $('#bookInfoPage').live( 'pageinit',function(event) {
 
 		}, null);
 	}); // transaction
+	
+
 });
 
 // Scan animation
@@ -209,23 +233,3 @@ $('#scanPage').live( 'pageinit',function(event){
     };
 	setInterval(changeImage, delayInSeconds * 150);
 });
-
-/* // Getting current location
-$( '#locationPage' ).live( 'pageinit',function(event){
-	$("#locate").click(function() {
-	  	navigator.geolocation.getCurrentPosition(foundLocation, noLocation);
-	});
-    
-	navigator.geolocation.getCurrentPosition(foundLocation, noLocation);
-    
-	function foundLocation(position) {
-	  	var lat = position.coords.latitude;
-	  	var lon = position.coords.longitude;
-	  	var userLocation = lat + ',' + lon;
-	}
-	function noLocation() {
-	  	$("#error").watermark("Could not find location");
-	  	document.getElementById("error").innerHtml = "Could not find location";
-	}
-})//end DocReady
-*/
