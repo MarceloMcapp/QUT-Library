@@ -27,20 +27,20 @@ function createDB() {
 			var output;
 	
 			db.transaction(function (tx) {
-				tx.executeSql('DROP TABLE libbook');
-				console.log("Table libbook dropped.");
-				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS libbook (id, title, edition, author, isbn ,location, availability, coverurl)');
-				console.log("Table libbook created.");
-				
-				tx.executeSql('INSERT INTO libbook VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "img/ios5.jpg")');
-				tx.executeSql('INSERT INTO libbook VALUES (2, "iOS 4 Programming Cookbook", "1st edition", "Nahavandipoor, Vandad", "9377345634634","Kelvin Grove (005.26.84)", "Available", "")');
-				tx.executeSql('INSERT INTO libbook VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "97800321116291","Gardens Point (005.06.32)", "Available", "")');
-				tx.executeSql('INSERT INTO libbook VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "")');
-				console.log("4 items inserted into table libbook");
+				// tx.executeSql('DROP TABLE libbook');
+				// console.log("Table libbook dropped.");
+				// 
+				// tx.executeSql('CREATE TABLE IF NOT EXISTS libbook (id INTEGER NOT NULL PRIMARY KEY, title, edition, author, isbn ,location, availability, coverurl)');
+				// console.log("Table libbook created.");
+				// 
+				// tx.executeSql('INSERT INTO libbook VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "img/ios5.jpg")');
+				// tx.executeSql('INSERT INTO libbook VALUES (2, "iOS 4 Programming Cookbook", "1st edition", "Nahavandipoor, Vandad", "9377345634634","Kelvin Grove (005.26.84)", "Available", "")');
+				// tx.executeSql('INSERT INTO libbook VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "97800321116291","Gardens Point (005.06.32)", "Available", "")');
+				// tx.executeSql('INSERT INTO libbook VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "")');
+				// console.log("4 items inserted into table libbook");
 				
 				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId, loanDate, endDate)');
-				
+
 				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId)');
 			
 			}); // DB transaction
@@ -75,6 +75,8 @@ function emptyList(listId) {
 	    	elem.remove();
 	  	}
 	);
+	
+	console.log("Elements removed from list " + listId);
 }
 
 // Search page
@@ -83,16 +85,20 @@ $('#searchPage').live( 'pageinit',function(event) {
 
 		var searchValue = document.getElementById("searchBooksField").value;
 		
-		emptyList("#bookSearchListing");
+		
+//		emptyList("#bookSearchListing");
 
+		console.log("Fetching all books where title = " + searchValue);
+		
 		db.transaction(function (tx) {
+			console.log("Executing sql.");
+			
 			tx.executeSql('SELECT * FROM libbook WHERE (title LIKE ?)', ["%"+searchValue+"%"], function (tx, results) {
+				console.log("Executed ...");
 				var len = results.rows.length, i;
 		
-			   	// output = "<p>Found rows: " + len + "</p>";
-				// alert(output);
-			   	// document.querySelector('#status').innerHTML +=  output;
-		
+				console.log(len + " rows found. Adding to list: ");
+				
 		   		for (i = 0; i < len; i++){
 					$("ul").append("<li><a href='book.html?id=" + results.rows.item(i).id + "'>\n"
 									+ "<h3 class='listingBookTitle'>" + results.rows.item(i).title + "</h3>\n"
@@ -101,11 +107,14 @@ $('#searchPage').live( 'pageinit',function(event) {
 									+ "<p class='listAvailability'>" + results.rows.item(i).availability + "</p>"
 									+ "</div>"
 									+ "</a></li>");
+					console.log("Added: " + results.rows.item(i).title);
 				}
 
+				console.log("Refreshing list.");
 				$("#bookSearchListing").listview("refresh"); // This line now updates the listview
 		 	}, null);
 		}); // transaction
+		
 		return false;
 	}); // submit
 });
@@ -114,7 +123,7 @@ $('#searchPage').live( 'pageinit',function(event) {
 $('#bookInfoPage').live( 'pageinit',function(event) {
 	
 	var $_GET = {};
-
+	
 	document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
 	    function decode(s) {
 	        return decodeURIComponent(s.split("+").join(" "));
@@ -123,13 +132,14 @@ $('#bookInfoPage').live( 'pageinit',function(event) {
 	    $_GET[decode(arguments[1])] = decode(arguments[2]);
 	});
 
-	var id= parseInt($_GET["id"]);
 
+	var id = parseInt($_GET["id"]);
 	
+	console.log("Fetching book with id = " + id);
 	db.transaction(function (tx) {
 		tx.executeSql('SELECT * FROM libbook WHERE id = ?', [id], function (tx, result) {
+
 			var book = result.rows.item(0);
-			
 
 			document.querySelector('.bookTitle').innerHTML = book.title;
 			document.querySelector('.bookEdition').innerHTML = book.edition;
@@ -138,7 +148,12 @@ $('#bookInfoPage').live( 'pageinit',function(event) {
 			document.querySelector('.bookISBN').innerHTML = book.isbn;
 			document.querySelector('.bookAvailability').innerHTML = book.availability;
 
-			document.getElementById("bookInfoImage").src = book.coverurl;
+			var cover = document.getElementById("bookInfoImage");
+			if(book.coverurl){
+				cover.src = book.coverurl;
+			} else {
+				cover.src = "img/defaultCover.jpg";
+			}
 
 		}, null);
 	}); // transaction
