@@ -166,6 +166,7 @@ div#loaned {
 
 .bookDetails span {
 	display: block;
+
 }
 
 .bookCover {
@@ -174,14 +175,17 @@ div#loaned {
 	display: inline;
 }
 
-span.bookTitle {
-	font-size: 16px;
+.bookTitle {
+	font-size: 18px;
 }
 
-.bookEdition {
+.bookEdition, .bookISBN {
+	font-size: 11px;
 	font-style: italic;
 	margin: 10px 5px;
 }
+
+
 span.bookAuthor {
 /* 	text-indent: -15px;
 	margin-left: 100px;*/

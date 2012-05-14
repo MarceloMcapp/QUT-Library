@@ -10,7 +10,7 @@ if (!window.openDatabase) {
 
 function initDB() {
 	try {
-		db = openDatabase('mydb', '1.0', 'Library Database', 2 * 1024 * 1024);		
+		db = openDatabase('mydb', '1.0', 'Library Database', 2 * 1024 * 1024);
 		console.log("Database open.");
 	} catch(e) {
 		if ( e == 2) {
@@ -26,10 +26,10 @@ function createDB() {
 			initDB();
 			
 			db.transaction(function (tx) {
-				tx.executeSql('DROP TABLE BOOKS');
-				console.log("Table BOOKS dropped.");
+//				tx.executeSql('DROP TABLE BOOKS');
+//				console.log("Table BOOKS dropped.");
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY, title, edition, author, isbn ,location, availability, coverurl)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY UNIQUE, title, edition, author, isbn ,location, availability, coverurl)');
 				console.log("Table BOOKS created.");
 				
 				tx.executeSql('INSERT INTO BOOKS VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "img/ios5.jpg")');
@@ -37,7 +37,7 @@ function createDB() {
 				tx.executeSql('INSERT INTO BOOKS VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "97800321116291","Gardens Point (005.06.32)", "Available", "")');
 				tx.executeSql('INSERT INTO BOOKS VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "")');
 				console.log("4 items inserted into table BOOKS");
-				// 
+
 				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId, loanDate, endDate)');
 				// 
 				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId)');
@@ -53,41 +53,12 @@ function createDB() {
             console.log("Unknown error "+e+".");  
         }
 
-       	return;  
-
+       	return false;
 	} // catch
 	
 }
 
-// $(document).ready(function() {
-// 	$("#listbutton").click(function() {
-// 		console.log("Listbutton clicked");
-// 		db.transaction(function (tx) {
-// 			tx.executeSql('SELECT * FROM BOOKS', [], function (tx, results) {
-// 
-// 				var len = results.rows.length, i;
-// 		
-// 			   	// output = "<p>Found rows: " + len + "</p>";
-// 			   	// 		   		document.querySelector('#status').innerHTML +=  output;
-// 				alert("");
-// 		   		for (i = 0; i < len; i++){
-// 					$("ul").append("<li><a href='book?id=" + results.rows.item(i).id + "\n"
-// 									+ "<h3 class='listingBookTitle'>" + results.rows.item(i).title + "</h3>\n"
-// 									+ "<div><br/>"
-// 									+ "<p class='author'>" + results.rows.item(i).author + "</p>"
-// 									+ "<p class='listAvailability'>" + results.rows.item(i).availability + "</p>"
-// 									+ "</div>"
-// 									+ "</a></li>");
-// 				}
-// 
-// 				$("#bookSearchListing").listview("refresh"); // This line now updates the listview
-// 		 	}, null);
-// 			
-// 			
-// 		});
-// 	});
-// });
-
+// empties list with given #listid
 function emptyList(listId) {
 	// Removing all elements in list
 	console.log("Removing all elements in list " + listId);
@@ -104,9 +75,10 @@ function emptyList(listId) {
 }
 
 // Search page
-// $('#searchPage').live( 'pageinit',function(event) {
-// 	console.log("Search page init");
-// });
+$('#searchPage').live( 'pageinit',function(event) {
+	console.log("Search page init");
+});
+
 
 $("#search").live( 'submit', function() {
 	
@@ -120,15 +92,12 @@ $("#search").live( 'submit', function() {
 	db.transaction(function (tx) {
 		console.log("Executing ...");
 		tx.executeSql('SELECT * FROM BOOKS WHERE (title LIKE ?)', ["%" + searchValue + "%"], function (tx, results) {
-			console.log("Executed.");
-			
-			
+			console.log("Executed!");
 			var books = results.rows;
 			var book;
-			var len = books.length, i;
+			var len = books.length;
 
 			console.log(len + " rows found. Adding to list: ");
-			
 			
 			for (i = 0; i < len; i++) {
 				book = results.rows.item(i);
@@ -139,22 +108,15 @@ $("#search").live( 'submit', function() {
 								+ "<p class='listAvailability'>" + book.availability + "</p>"
 								+ "</div>"
 								+ "</a></li>");
-				console.log("Added: " + results.rows.item(i).title);
+				console.log("Appending: " + results.rows.item(i).title);
 			}
 
 			console.log("Refreshing list.");
+			$("#bookSearchListing").listview("refresh");
 			
-			$("#bookSearchListing").listview("refresh"); // This line now updates the listview		
-			
-	 	}, null);
-		
+	 	}, null); // execute sql
 	}); // transaction
-
-
 }); // submit
-	
-	
-
 
 var bookNumber;
 $(".bookLink").live('click', function() {
@@ -169,13 +131,19 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 	    function decode(s) {
 	        return decodeURIComponent(s.split("+").join(" "));
 	    }
-
+	
 	    $_GET[decode(arguments[1])] = decode(arguments[2]);
 	});
 	
-	var id = parseInt($_GET["id"]);
-	if (isNaN(id)) {
-		id = window.bookNumber;
+	
+	// If page refreshed manually the search will fail
+	var id;
+	
+	if (isNaN($_GET["id"])) {
+	
+		id = parseInt(bookNumber);
+	} else {
+		id = parseInt($_GET["id"]);
 	}
 	
 	console.log("Fetching book with id = " + id);
@@ -189,7 +157,7 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 			document.querySelector('.bookEdition').innerHTML = book.edition;
 			document.querySelector('.bookAuthor').innerHTML = book.author;
 			document.querySelector('.bookLocation').innerHTML = book.location;
-			document.querySelector('.bookISBN').innerHTML = book.isbn;
+			document.querySelector('.bookISBN').innerHTML = "ISBN " + book.isbn;
 			document.querySelector('.bookAvailability').innerHTML = book.availability;
 
 			var cover = document.getElementById("bookInfoImage");
@@ -201,8 +169,6 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 
 		}, null);
 	}); // transaction
-	
-
 });
 
 // Scan animation
