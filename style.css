@@ -132,7 +132,15 @@ div#notAvailable {
 	background: -webkit-gradient(linear, left top, left bottom, from(#faa), to(#f77));
 }
 
-div#loaned {
+.scanned {
+	display: inherit;
+}
+
+.notScanned {
+	display: none;
+}
+
+div#loanSuccess {
 	background-color: none;
 	border: none;
 	font-size: 18px;

@@ -27,9 +27,9 @@ function createDB() {
 			
 			db.transaction(function (tx) {
 //				tx.executeSql('DROP TABLE BOOKS');
-//				console.log("Table BOOKS dropped.");
+				console.log("Table BOOKS dropped.");
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY UNIQUE, title, edition, author, isbn ,location, availability, coverurl)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, title VARCHAR NOT NULL, edition, author VARCHAR NOT NULL, isbn VARCHAR NOT NULL ,location VARCHAR NOT NULL, availability VARCHAR NOT NULL, coverurl VARCHAR)');
 				console.log("Table BOOKS created.");
 				
 				tx.executeSql('INSERT INTO BOOKS VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "img/ios5.jpg")');
@@ -38,12 +38,16 @@ function createDB() {
 				tx.executeSql('INSERT INTO BOOKS VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "")');
 				console.log("4 items inserted into table BOOKS");
 
-				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId, loanDate, endDate)');
-				// 
-				// tx.executeSql('CREATE TABLE IF NOT EXISTS loaned (id, bookId)');
-			
+//				tx.executeSql('DROP TABLE LOANED');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS LOANED (id INT NOT NULL PRIMARY KEY ASC UNIQUE, bookId INT NOT NULL, loanDate VARCHAR NOT NULL, endDate VARCHAR NOT NULL)');
+				console.log("Table LOANED created.");
+
+				// tx.executeSql('CREATE TABLE IF NOT EXISTS REQUESTS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, bookId INT NOT NULL, loanDate VARCHAR NOT NULL, endDate VARCHAR NOT NULL)');
+				// console.log("Table REQUESTS created.");
+				
+				tx.executeSql('CREATE TABLE IF NOT EXISTS FAVOURITES (id INT NOT NULL PRIMARY KEY UNIQUE, bookId)');
+				console.log("Table FAVOURITES created.");
 			}); // DB transaction
-			
 		} // end else
 	} catch(e) {  
         if (e == 2) {  
@@ -58,7 +62,7 @@ function createDB() {
 	
 }
 
-// empties list with given #listid
+// Empties list with given #listid
 function emptyList(listId) {
 	// Removing all elements in list
 	console.log("Removing all elements in list " + listId);
@@ -123,6 +127,10 @@ $(".bookLink").live('click', function() {
 	bookNumber = this.name;
 });
 
+// $("#favouriteBook").live('click', function() {
+// 	
+// });
+
 // Book information page
 $('#bookInfoPage').live('pageinit' ,function(event) {
 
@@ -140,17 +148,62 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 	var id;
 	
 	if (isNaN($_GET["id"])) {
-	
 		id = parseInt(bookNumber);
 	} else {
 		id = parseInt($_GET["id"]);
+		bookNumber = id;
+	}
+	
+	var scanned;
+	var loaned = document.getElementById("loanSuccess");
+
+	if (document.referrer.indexOf('scanMock.html') != -1) {
+	  // do something
+		scanned = true;
+		document.getElementById("loanSuccess").class = "scanned";
+		loaned.style.display = '';
+		
+		// Todays date
+		var sDate=new Date();
+	    var sDat=sDate.getDate();
+	    var sMon=sDate.getMonth();
+	    var sYear=sDate.getFullYear();
+	    var startDate = sDat+"/"+sMon+"/"+sYear;
+
+		// + one month
+		var eDate=new Date();
+	    var eDat=eDate.getDate();
+	    var eMon=eDate.getMonth() + 1;
+	    var eYear=eDate.getFullYear();
+	
+		// To make sure days in calendar don't exist
+		if ((eDat == 31 && eMon == 4 || eMon == 6 || eMon == 9 || eMon == 11) || (eDat > 28 && eMon == 2 && eYear % 4) ) {
+			eDat = 1;
+			eMon++;
+		}
+		if (eMon == 13) {
+			eMon = 1
+			eYear++;
+		}
+		
+		var endDate = eDat+"/"+eMon+"/"+eYear;
+		
+		db.transaction(function (tx) {
+			tx.executeSql('INSERT INTO LOANED (bookId, loanDate, endDate) VALUES (' + id + ', ' + startDate + ', ' + endDate + ')');
+			console.log("Book with id " + id + " was loaned.");
+		}); // DB transaction	
+	}
+	else {
+		scanned = false;
+		document.getElementById("loanSuccess").class = "notScanned";
+		loaned.style.display = 'none';
+		
 	}
 	
 	console.log("Fetching book with id = " + id);
 
 	db.transaction(function (tx) {
-		tx.executeSql('SELECT * FROM BOOKS WHERE id = ?', [id], function (tx, result) {
-
+		tx.executeSql('SELECT * FROM BOOKS WHERE id = ?', [id], function (tx, result) {			
 			var book = result.rows.item(0);
 
 			document.querySelector('.bookTitle').innerHTML = book.title;
@@ -158,7 +211,10 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 			document.querySelector('.bookAuthor').innerHTML = book.author;
 			document.querySelector('.bookLocation').innerHTML = book.location;
 			document.querySelector('.bookISBN').innerHTML = "ISBN " + book.isbn;
-			document.querySelector('.bookAvailability').innerHTML = book.availability;
+
+			if (!scanned) {
+				document.querySelector('.bookAvailability').innerHTML = book.availability;
+			}
 
 			var cover = document.getElementById("bookInfoImage");
 			if(book.coverurl){
@@ -166,7 +222,6 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 			} else {
 				cover.src = "img/defaultCover.jpg";
 			}
-
 		}, null);
 	}); // transaction
 });
@@ -193,9 +248,11 @@ $('#scanPage').live( 'pageinit',function(event){
 			currImg++;
         }
 		else {
-			window.location = "loanConfirm.html"
+			window.location = "book.html?id=" + bookNumber;
 		}
 
     };
 	setInterval(changeImage, delayInSeconds * 150);
 });
+
+

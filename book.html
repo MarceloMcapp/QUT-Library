@@ -26,10 +26,13 @@
 		<div data-role="header" data-theme="b">
 			<a href="search.html" data-transition="reverse slide" data-icon="back">Back</a>
 			<h1>Search</h1>
-			<a href="" data-theme="b" data-inline="true" data-mini="true" data-iconpos="notext" data-icon="star" title="Favourite"></a>
+			<a href="" id="favouriteBook" data-theme="b" data-inline="true" data-mini="true" data-iconpos="notext" data-icon="star" title="Favourite"></a>
 		</div><!-- /header -->
 
 		<div data-role="content">
+			<div class="availability" id="loanSuccess">
+				Successfully loaned!
+			</div>
 			<div>
 				<div class="bookCover">
 					<img id="bookInfoImage" src="" />
