@@ -19,25 +19,18 @@
 
 </head>
 
-<body onload="test()"> 
+<body> 
 
-	<div data-role="page" data-theme="c">
+	<div id="loanedBooksPage" data-role="page" data-theme="c">
 
 		<div data-role="header" data-theme="b">
 			<a href="index.html" data-transition="reverse slide" data-icon="home">Home</a>
 			<h1>Loaned books</h1>
 		</div><!-- /header -->
 
-		<div data-role="content">	
-			<ul data-role="listview" data-filter="true">
-				<li class="bookTitle">Designing interactive systems: people, activities, contexts, technologies
-					<div>
-						<br />
-						<p>David Benyon, Phil Turner, and Susan Turner.</p>
-						<p>2005, ISBN 9780321116291</p>
-						<p class="dueDate">DUE DATE: 14/05-2012</p>
-					</div>
-				</li>
+		<div data-role="content">				
+			<ul data-role="listview" data-filter="true" id="loanedBooksListing">
+				<!-- Data from the database will be loaded here-->
 			</ul>
 		</div><!-- /content -->
 

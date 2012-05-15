@@ -26,27 +26,32 @@ function createDB() {
 			initDB();
 			
 			db.transaction(function (tx) {
-//				tx.executeSql('DROP TABLE BOOKS');
+				tx.executeSql('DROP TABLE BOOKS');
 				console.log("Table BOOKS dropped.");
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, title VARCHAR NOT NULL, edition, author VARCHAR NOT NULL, isbn VARCHAR NOT NULL ,location VARCHAR NOT NULL, availability VARCHAR NOT NULL, coverurl VARCHAR)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, title VARCHAR NOT NULL, edition, author VARCHAR NOT NULL, isbn VARCHAR NOT NULL ,location VARCHAR NOT NULL, availability VARCHAR NOT NULL, loaned VARCHAR, favourite VARCHAR,  coverurl VARCHAR)');
 				console.log("Table BOOKS created.");
 				
-				tx.executeSql('INSERT INTO BOOKS VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "img/ios5.jpg")');
-				tx.executeSql('INSERT INTO BOOKS VALUES (2, "iOS 4 Programming Cookbook", "1st edition", "Nahavandipoor, Vandad", "9377345634634","Kelvin Grove (005.26.84)", "Available", "")');
-				tx.executeSql('INSERT INTO BOOKS VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "97800321116291","Gardens Point (005.06.32)", "Available", "")');
-				tx.executeSql('INSERT INTO BOOKS VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "false", "false", "img/ios5.jpg")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (2, "iOS 4 Programming Cookbook", "1st edition", "Nahavandipoor, Vandad", "9377345634634","Kelvin Grove (005.26.84)", "Available", "false", "false", "")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "97800321116291","Gardens Point (005.06.32)", "Available", "false", "false", "")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "false", "false", "")');
 				console.log("4 items inserted into table BOOKS");
 
-//				tx.executeSql('DROP TABLE LOANED');
-				tx.executeSql('CREATE TABLE IF NOT EXISTS LOANED (id INT NOT NULL PRIMARY KEY ASC UNIQUE, bookId INT NOT NULL, loanDate VARCHAR NOT NULL, endDate VARCHAR NOT NULL)');
-				console.log("Table LOANED created.");
-
+				// tx.executeSql('DROP TABLE LOANED');
+				// tx.executeSql('CREATE TABLE IF NOT EXISTS LOANED (id INT NOT NULL PRIMARY KEY ASC UNIQUE, bookId INT NOT NULL, loanDate VARCHAR NOT NULL, endDate VARCHAR NOT NULL)');
+				// console.log("Table LOANED created.");
+				// 
+				// tx.executeSql('INSERT INTO LOANED VALUES (1, 1, "A", "B")');
+				// tx.executeSql('INSERT INTO LOANED VALUES (2, 3, "C", "D")');
+				// 
+				// console.log("2 item inserted into table LOANED");
+				
 				// tx.executeSql('CREATE TABLE IF NOT EXISTS REQUESTS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, bookId INT NOT NULL, loanDate VARCHAR NOT NULL, endDate VARCHAR NOT NULL)');
 				// console.log("Table REQUESTS created.");
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS FAVOURITES (id INT NOT NULL PRIMARY KEY UNIQUE, bookId)');
-				console.log("Table FAVOURITES created.");
+				// tx.executeSql('CREATE TABLE IF NOT EXISTS FAVOURITES (id INT NOT NULL PRIMARY KEY UNIQUE, bookId)');
+				// console.log("Table FAVOURITES created.");
 			}); // DB transaction
 		} // end else
 	} catch(e) {  
@@ -78,10 +83,10 @@ function emptyList(listId) {
 	console.log("Elements removed from list " + listId);
 }
 
-// Search page
-$('#searchPage').live( 'pageinit',function(event) {
-	console.log("Search page init");
-});
+// // Search page
+// $('#searchPage').live( 'pageinit',function(event) {
+// 	console.log("Search page init");
+// });
 
 
 $("#search").live( 'submit', function() {
@@ -122,6 +127,43 @@ $("#search").live( 'submit', function() {
 	}); // transaction
 }); // submit
 
+
+$('#loanedBooksPage').live('pageinit', function(event) {
+	console.log("Listing all loaned books ...");
+	
+	db.transaction(function (tx) {
+		console.log("Transaction started.");
+
+		tx.executeSql('SELECT * FROM BOOKS WHERE (loaned LIKE ?)' , ["true"], function (tx, results) {
+			console.log("SQL Executed");
+			
+			var books = results.rows;
+			var book;
+			var len = books.length;
+
+			console.log(len + " rows found. Adding to list: ");
+			
+			for (i = 0; i < len; i++) {
+				book = results.rows.item(i);
+				$("ul#loanedBooksListing").append("<li><a class='bookLink' href='book.html?id=" + book.id + "' name='" + book.id + "'>\n"
+								+ "<h3 class='listingBookTitle'>" + book.title + "</h3>\n"
+								+ "<div><br/>"
+								+ "<p class='author'>" + book.author + "</p>"
+								+ "<p class='listAvailability'>" + book.availability + "</p>"
+								+ "</div>"
+								+ "</a></li>");
+				console.log("Appending: " + results.rows.item(i).title);
+			}
+
+			console.log("Refreshing list.");
+			$("#loanedBooksListing").listview("refresh");
+			
+		}, null); // execute sql
+	}); // transaction
+});
+
+var scanned = "";
+
 var bookNumber;
 $(".bookLink").live('click', function() {
 	bookNumber = this.name;
@@ -133,7 +175,6 @@ $(".bookLink").live('click', function() {
 
 // Book information page
 $('#bookInfoPage').live('pageinit' ,function(event) {
-
 	var $_GET = {};
 	document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
 	    function decode(s) {
@@ -154,15 +195,14 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 		bookNumber = id;
 	}
 	
-	var scanned;
+
 	var loaned = document.getElementById("loanSuccess");
 
-	if (document.referrer.indexOf('scanMock.html') != -1) {
-	  // do something
-		scanned = true;
-		document.getElementById("loanSuccess").class = "scanned";
+	if ( scanned == "true") { // document.referrer.indexOf('scanMock.html') != -1) {
+		scanned = "false";
 		loaned.style.display = '';
 		
+		/*
 		// Todays date
 		var sDate=new Date();
 	    var sDat=sDate.getDate();
@@ -187,21 +227,18 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 		}
 		
 		var endDate = eDat+"/"+eMon+"/"+eYear;
+		*/
 		
 		db.transaction(function (tx) {
-			tx.executeSql('INSERT INTO LOANED (bookId, loanDate, endDate) VALUES (' + id + ', ' + startDate + ', ' + endDate + ')');
+			tx.executeSql('UPDATE BOOKS SET loaned="true" WHERE id = ?',[id]);
 			console.log("Book with id " + id + " was loaned.");
 		}); // DB transaction	
 	}
 	else {
-		scanned = false;
-		document.getElementById("loanSuccess").class = "notScanned";
 		loaned.style.display = 'none';
-		
 	}
 	
 	console.log("Fetching book with id = " + id);
-
 	db.transaction(function (tx) {
 		tx.executeSql('SELECT * FROM BOOKS WHERE id = ?', [id], function (tx, result) {			
 			var book = result.rows.item(0);
@@ -212,8 +249,17 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 			document.querySelector('.bookLocation').innerHTML = book.location;
 			document.querySelector('.bookISBN').innerHTML = "ISBN " + book.isbn;
 
-			if (!scanned) {
+
+			var availability = document.getElementById("bookInfoAvailability");
+			var loanButton = document.getElementById("loanButton");
+
+			if (book.loaned == "true") {
+				availability.style.display = 'none';
+				loanButton.style.display = 'none';
+			} else {
+				availability.style.display = '';
 				document.querySelector('.bookAvailability').innerHTML = book.availability;
+				loanButton.style.display = '';
 			}
 
 			var cover = document.getElementById("bookInfoImage");
@@ -228,7 +274,7 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 
 // Scan animation
 $('#scanPage').live( 'pageinit',function(event){
-	
+	window.scanned = "true";
 	var rotator = document.getElementById("scanImg1"); // change to match image ID
 	var imageDir = 'img/scan/';						   // change to match images folder
 	var delayInSeconds = 5;                            // set number of seconds delay
@@ -248,11 +294,14 @@ $('#scanPage').live( 'pageinit',function(event){
 			currImg++;
         }
 		else {
-			window.location = "book.html?id=" + bookNumber;
+
+			$.mobile.changePage("book.html?id=" + bookNumber + "&scanned=true");
 		}
 
     };
-	setInterval(changeImage, delayInSeconds * 150);
+	while (scanned == "true") {
+		setInterval(changeImage, delayInSeconds * 150);
+	}
 });
 
 
