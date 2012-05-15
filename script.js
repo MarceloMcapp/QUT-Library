@@ -163,7 +163,7 @@ $('#loanedBooksPage').live('pageinit', function(event) {
 });
 
 var scanned = "";
-
+var interval;
 var bookNumber;
 $(".bookLink").live('click', function() {
 	bookNumber = this.name;
@@ -175,6 +175,8 @@ $(".bookLink").live('click', function() {
 
 // Book information page
 $('#bookInfoPage').live('pageinit' ,function(event) {
+	clearInterval(interval);
+	
 	var $_GET = {};
 	document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
 	    function decode(s) {
@@ -299,9 +301,7 @@ $('#scanPage').live( 'pageinit',function(event){
 		}
 
     };
-	while (scanned == "true") {
-		setInterval(changeImage, delayInSeconds * 150);
-	}
+	interval = setInterval(changeImage, delayInSeconds * 100);
 });
 
 
