@@ -126,6 +126,21 @@ h3.listingBookTitle {
 	font-size: 12px;
 }
 
+.bookAvailability {
+	font-size: 14px;
+	float: left;
+	color: #480;
+	opacity: 0.8;
+	font-style: italic;
+	display: block;
+	width: 100%;
+	margin: 0px;
+	margin-top: -10px;
+	padding: 0px;
+	text-align: right;
+
+}
+
 div#notAvailable {
 	background-color: #f77;
 	border: 1px solid #f99;
@@ -187,7 +202,7 @@ div#loanSuccess {
 	font-size: 18px;
 }
 
-.bookEdition, .bookISBN {
+.bookEditionYear, .bookISBN, .bookYear{
 	font-size: 11px;
 	font-style: italic;
 	margin: 10px 5px;
@@ -202,7 +217,7 @@ span.bookAuthor {
 	font-weight: normal;
 }
 
-.bookEdition, .bookLocation{
+.bookEditionYear, .bookLocation{
 	font-weight: normal;
 	font-size: 12px;
 }

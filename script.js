@@ -1,5 +1,6 @@
-
-
+var scanned = "";
+var interval;
+var bookNumber;
 
 if (!window.openDatabase) {  
    	console.log('Databases are not supported in this browser.');
@@ -18,6 +19,7 @@ function initDB() {
 		}
 	}
 }
+
 function createDB() {
 	try {
 		if (!window.openDatabase) {  
@@ -29,29 +31,20 @@ function createDB() {
 				tx.executeSql('DROP TABLE BOOKS');
 				console.log("Table BOOKS dropped.");
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, title VARCHAR NOT NULL, edition, author VARCHAR NOT NULL, isbn VARCHAR NOT NULL ,location VARCHAR NOT NULL, availability VARCHAR NOT NULL, loaned VARCHAR, favourite VARCHAR,  coverurl VARCHAR)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, title VARCHAR NOT NULL, edition, author VARCHAR NOT NULL, year VARCHAR NOT NULL , isbn VARCHAR NOT NULL ,location VARCHAR NOT NULL, locNumber VARCHAR NOT NULL, availability VARCHAR NOT NULL, loaned VARCHAR, favourite VARCHAR,  coverurl VARCHAR)');
 				console.log("Table BOOKS created.");
 				
-				tx.executeSql('INSERT INTO BOOKS VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "94357852987252", "Gardens Point (004.11.02)", "Available", "false", "false", "img/ios5.jpg")');
-				tx.executeSql('INSERT INTO BOOKS VALUES (2, "iOS 4 Programming Cookbook", "1st edition", "Nahavandipoor, Vandad", "9377345634634","Kelvin Grove (005.26.84)", "Available", "false", "false", "")');
-				tx.executeSql('INSERT INTO BOOKS VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "97800321116291","Gardens Point (005.06.32)", "Available", "false", "false", "")');
-				tx.executeSql('INSERT INTO BOOKS VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "0805856188", "Gardens Point (620.82.244)", "Available", "false", "false", "")');
+				// tx.executeSql('INSERT INTO BOOKS VALUES (ID, "TITLE", "EDITION", "AUTHORS", "YEAR", "ISBN", "LOCATION (000.00.000)", "Available", "false", "false", "IMG")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (1, "Pro iOS5 Tools: Xcode Instruments and Build Tools", "5th edition" ,"Alexander, Brandon", "2012", "94357852987252", "Gardens Point", "004.11.02", "Available", "false", "false", "img/ios5.jpg")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (2, "iOS 4 Programming Cookbook", "1st edition", "Nahavandipoor, Vandad", "2008", "9377345634634","Kelvin Grove", "005.26.84", "Available", "false", "false", "")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (3, "Designing Interactive Systems: People, Activities, Context, Technologies", "3th edition" ,"Benyon, David", "2009" ,"97800321116291","Gardens Point", "005.06.32", "Available", "false", "false", "")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (4, "Theories and practice in interaction design", "1st edition", "Bagnara, Sebastiano", "2008", "0805856188", "Gardens Point", "620.82.244", "Available", "false", "false", "")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (5, "Java programming: comprehensive concepts and techniques", "3st edition", "Shelly, Gary B et al.", "2006", "1418859850", "Kelvin Grove", "005.71.2262", "Available", "false", "false", "img/javaComprehensive.jpg")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (6, "Java programming : from problem analysis to program design", "1st edition", "Malik, D. S.", "2008", "1423901355", "Gardens Point", "005.133 JAVA 183/3", "Available", "false", "false", "img/javaprogramming.jpg")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (7, "Web 2.0: principles and best practices", "1st edition", "Musser, John et al.", "2007", "0596527691", "Kelvin Grove", "381.142.12", "Available", "false", "false", "img/web2.jpg")');
+				tx.executeSql('INSERT INTO BOOKS VALUES (8, "Economics for today", "4th edition", "Layton, Allan P.", "2011", "9780170190855", "Gardens Point", "330 871/4", "Available", "false", "false", "img/economicstoday.jpg")');
+				
 				console.log("4 items inserted into table BOOKS");
-
-				// tx.executeSql('DROP TABLE LOANED');
-				// tx.executeSql('CREATE TABLE IF NOT EXISTS LOANED (id INT NOT NULL PRIMARY KEY ASC UNIQUE, bookId INT NOT NULL, loanDate VARCHAR NOT NULL, endDate VARCHAR NOT NULL)');
-				// console.log("Table LOANED created.");
-				// 
-				// tx.executeSql('INSERT INTO LOANED VALUES (1, 1, "A", "B")');
-				// tx.executeSql('INSERT INTO LOANED VALUES (2, 3, "C", "D")');
-				// 
-				// console.log("2 item inserted into table LOANED");
-				
-				// tx.executeSql('CREATE TABLE IF NOT EXISTS REQUESTS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, bookId INT NOT NULL, loanDate VARCHAR NOT NULL, endDate VARCHAR NOT NULL)');
-				// console.log("Table REQUESTS created.");
-				
-				// tx.executeSql('CREATE TABLE IF NOT EXISTS FAVOURITES (id INT NOT NULL PRIMARY KEY UNIQUE, bookId)');
-				// console.log("Table FAVOURITES created.");
 			}); // DB transaction
 		} // end else
 	} catch(e) {  
@@ -127,7 +120,6 @@ $("#search").live( 'submit', function() {
 	}); // transaction
 }); // submit
 
-
 $('#loanedBooksPage').live('pageinit', function(event) {
 	console.log("Listing all loaned books ...");
 	
@@ -148,8 +140,8 @@ $('#loanedBooksPage').live('pageinit', function(event) {
 				$("ul#loanedBooksListing").append("<li><a class='bookLink' href='book.html?id=" + book.id + "' name='" + book.id + "'>\n"
 								+ "<h3 class='listingBookTitle'>" + book.title + "</h3>\n"
 								+ "<div><br/>"
-								+ "<p class='author'>" + book.author + "</p>"
-								+ "<p class='listAvailability'>" + book.availability + "</p>"
+								+ "<p class='author'>by "+ book.author + "</p>"
+								+ "<p class='bookYear>"+ book.year +"</p><p class='campusLocation'>"+ book.location +"</p>"
 								+ "</div>"
 								+ "</a></li>");
 				console.log("Appending: " + results.rows.item(i).title);
@@ -162,9 +154,7 @@ $('#loanedBooksPage').live('pageinit', function(event) {
 	}); // transaction
 });
 
-var scanned = "";
-var interval;
-var bookNumber;
+
 $(".bookLink").live('click', function() {
 	bookNumber = this.name;
 });
@@ -246,10 +236,11 @@ $('#bookInfoPage').live('pageinit' ,function(event) {
 			var book = result.rows.item(0);
 
 			document.querySelector('.bookTitle').innerHTML = book.title;
-			document.querySelector('.bookEdition').innerHTML = book.edition;
 			document.querySelector('.bookAuthor').innerHTML = book.author;
-			document.querySelector('.bookLocation').innerHTML = book.location;
+			document.querySelector('.bookEditionYear').innerHTML = book.edition + ", " + book.year;
+			document.querySelector('.bookLocation').innerHTML = book.location + " ( " + book.locNumber + " )";
 			document.querySelector('.bookISBN').innerHTML = "ISBN " + book.isbn;
+
 
 
 			var availability = document.getElementById("bookInfoAvailability");
