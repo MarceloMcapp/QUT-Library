@@ -28,10 +28,11 @@ function createDB() {
 			initDB();
 			
 			db.transaction(function (tx) {
-				tx.executeSql('DROP TABLE BOOKS');
+//				tx.executeSql('DROP TABLE BOOKS');
 				console.log("Table BOOKS dropped.");
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY ASC UNIQUE, title VARCHAR NOT NULL, edition, author VARCHAR NOT NULL, year VARCHAR NOT NULL , isbn VARCHAR NOT NULL ,location VARCHAR NOT NULL, locNumber VARCHAR NOT NULL, availability VARCHAR NOT NULL, loaned VARCHAR, favourite VARCHAR,  coverurl VARCHAR)');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS BOOKS (id INT NOT NULL PRIMARY KEY UNIQUE, title VARCHAR NOT NULL, edition VARCHAR, author VARCHAR NOT NULL, year VARCHAR NOT NULL, isbn VARCHAR NOT NULL, location VARCHAR NOT NULL, locNumber VARCHAR NOT NULL, availability VARCHAR NOT NULL, loaned VARCHAR NOT NULL, favourite VARCHAR,  coverurl VARCHAR)');
+
 				console.log("Table BOOKS created.");
 				
 				// tx.executeSql('INSERT INTO BOOKS VALUES (ID, "TITLE", "EDITION", "AUTHORS", "YEAR", "ISBN", "LOCATION (000.00.000)", "Available", "false", "false", "IMG")');
